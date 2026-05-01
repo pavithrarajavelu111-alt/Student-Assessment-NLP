@@ -10,25 +10,25 @@ This project is a web-based application developed using Flask that evaluates stu
 Features
 
 
-Student login and dashboard
+1. Student login and dashboard
 
 
-Teacher dashboard for monitoring performance
+2. Teacher dashboard for monitoring performance
 
 
-Automatic answer evaluation using NLP
+3. Automatic answer evaluation using NLP
 
 
-Cosine similarity for answer comparison
+4. Cosine similarity for answer comparison
 
 
-Doubt identification system
+5. Doubt identification system
 
 
-Clean UI using HTML & CSS.
+6. Clean UI using HTML & CSS.
 
 
-Technologies Used
+Technologies Used:
 
 
 Python (Flask)
