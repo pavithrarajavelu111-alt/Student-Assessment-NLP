@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Student Dashboard</title>
+<script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-green-50 p-8">
+
+<h1 class="text-3xl font-bold mb-4">Student Dashboard👩🏻‍🎓</h1>
+
+<div class="bg-white p-6 rounded-xl shadow mb-6">
+    <h2 class="text-xl font-semibold">{{ student.Name }}</h2>
+    <p>USN: {{ student.USN }}</p>
+    <p>Score: {{ "%.2f"|format(student.Marks) }}</p>
+    <p class="{{ 'text-green-600' if student.Result=='Pass' else 'text-red-500' }}">
+        {{ student.Result }}
+    </p>
+
+    <a href="/download/{{ student.USN }}"
+       class="mt-4 inline-block bg-green-500 text-white px-4 py-2 rounded">
+       Download Report
+    </a>
+</div>
+<div class="bg-white p-6 rounded-xl shadow mt-6">
+    <h2 class="text-xl font-bold mb-4">Answers📄</h2>
+
+    {% if answers %}
+        {% for a in answers %}
+        <div class="p-4 border rounded-lg mb-3">
+
+            <p class="font-semibold mb-1">{{ a.question }}</p>
+
+            <p class="text-sm text-gray-600">
+                Your Answer: {{ a.student }}
+            </p>
+
+            <p class="text-sm">
+                Correct Answer: {{ a.correct }}
+            </p>
+            <p class="text-sm mt-1">
+    Doubt:
+    <span class="
+        {% if 'Good' in a.doubt %}text-green-600
+        {% elif 'Partial' in a.doubt %}text-yellow-600
+        {% else %}text-red-500
+        {% endif %}
+    ">
+        {{ a.doubt }}
+    </span>
+</p>
+
+            {% if a.student.strip().lower() == a.correct.strip().lower() %}
+                <p class="text-green-600 font-bold mt-2">✔ Correct</p>
+            {% else %}
+                <p class="text-red-500 font-bold mt-2">✘ Wrong</p>
+            {% endif %}
+
+        </div>
+        {% endfor %}
+    {% else %}
+        <p>No answers available</p>
+    {% endif %}
+</div>
+
+</body>
+</html>

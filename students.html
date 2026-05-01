@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Students</title>
+<script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-green-100 p-8">
+
+<h1 class="text-2xl font-bold mb-6">Students List</h1>
+
+<!-- SEARCH + FILTER -->
+<div class="flex gap-4 mb-4">
+
+    <input 
+        type="text" 
+        id="searchInput"
+        placeholder="Search by Name or USN..."
+        class="p-2 border rounded w-1/2"
+    >
+
+    <select id="filterSelect" class="p-2 border rounded">
+        <option value="all">All</option>
+        <option value="Pass">Pass</option>
+        <option value="Fail">Fail</option>
+    </select>
+
+</div>
+
+<!-- TABLE -->
+<table class="w-full bg-white shadow rounded-xl overflow-hidden" id="studentTable">
+
+<thead class="bg-green-200">
+<tr>
+<th class="p-3">USN</th>
+<th class="p-3">Name</th>
+<th class="p-3">Marks</th>
+<th class="p-3">Status</th>
+</tr>
+</thead>
+
+<tbody>
+
+{% for s in students %}
+<tr class="border-b student-row">
+<td class="p-3">{{ s.USN }}</td>
+<td class="p-3">{{ s.Name }}</td>
+<td class="p-3">{{ s.Marks | round(1) }}</td>
+<td class="p-3 status {{ s.Result }}">{{ s.Result }}</td>
+</tr>
+{% endfor %}
+
+</tbody>
+</table>
+
+<!-- JS SEARCH + FILTER -->
+<script>
+
+const searchInput = document.getElementById("searchInput");
+const filterSelect = document.getElementById("filterSelect");
+const rows = document.querySelectorAll(".student-row");
+
+function filterTable() {
+    const search = searchInput.value.toLowerCase();
+    const filter = filterSelect.value;
+
+    rows.forEach(row => {
+        const usn = row.children[0].innerText.toLowerCase();
+        const name = row.children[1].innerText.toLowerCase();
+        const status = row.children[3].innerText;
+
+        const matchSearch = usn.includes(search) || name.includes(search);
+        const matchFilter = (filter === "all" || status === filter);
+
+        if (matchSearch && matchFilter) {
+            row.style.display = "";
+        } else {
+            row.style.display = "none";
+        }
+    });
+}
+
+searchInput.addEventListener("keyup", filterTable);
+filterSelect.addEventListener("change", filterTable);
+
+</script>
+
+</body>
+</html>

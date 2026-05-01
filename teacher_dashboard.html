@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Teacher Dashboard📊</title>
+
+<!-- Tailwind -->
+<script src="https://cdn.tailwindcss.com"></script>
+
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+</head>
+
+<body class="bg-green-50 font-sans">
+
+<div class="flex h-screen">
+
+    <!-- SIDEBAR -->
+    <div class="w-64 bg-gray-900 text-white flex flex-col justify-between p-5">
+        <div>
+            <h1 class="text-2xl font-bold mb-10">EduDash🚀</h1>
+
+            <nav class="space-y-4">
+                <a href="/teacher" class="block bg-green-500 px-4 py-2 rounded">Dashboard</a>
+                <a href="/students" class="block hover:bg-gray-700 px-4 py-2 rounded">Students</a>
+                <a href="/teacher#analytics" class="block hover:bg-gray-700 px-4 py-2 rounded">Analytics</a>
+                <a href="/" class="block hover:bg-red-500 px-4 py-2 rounded">Logout</a>
+            </nav>
+        </div>
+
+        <p class="text-sm text-gray-400">Teacher Panel</p>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div class="flex-1 p-8 overflow-y-auto">
+
+        <!-- HEADER -->
+        <h2 class="text-2xl font-semibold mb-6">
+            Welcome back, {{ teacher_name }}👋
+        </h2>
+
+        <!-- STATS -->
+        <div class="grid grid-cols-4 gap-6 mb-8">
+
+            <div class="bg-green-500 text-white p-5 rounded-xl shadow">
+                <p>Total Students</p>
+                <h2 class="text-2xl font-bold">{{ total }}</h2>
+            </div>
+
+            <div class="bg-white p-5 rounded-xl shadow">
+                <p>Passed</p>
+                <h2 class="text-xl text-green-600 font-bold">{{ passed }}</h2>
+            </div>
+
+            <div class="bg-white p-5 rounded-xl shadow">
+                <p>Failed</p>
+                <h2 class="text-xl text-red-500 font-bold">{{ failed }}</h2>
+            </div>
+
+            <div class="bg-white p-5 rounded-xl shadow">
+                <p>Pass %</p>
+                <h2 class="text-xl font-bold">{{ pass_percent }}%</h2>
+            </div>
+
+        </div>
+
+        <!-- CHARTS -->
+        <div id="analytics" class="grid grid-cols-2 gap-6 mb-8">
+
+            <!-- BAR -->
+            <div class="bg-white p-5 rounded-xl shadow">
+                <h3 class="mb-3 font-semibold">Weak Topics📊</h3>
+                <canvas id="barChart" style="height:250px;"></canvas>
+            </div>
+
+            <!-- PIE -->
+            <div class="bg-white p-5 rounded-xl shadow">
+
+    <h3 class="mb-3 font-semibold text-center">Results</h3>
+
+    <!-- FIXED CENTERING -->
+    <div class="flex items-center justify-center w-full">
+        <div style="width:220px; height:220px;">
+            <canvas id="pieChart"></canvas>
+        </div>
+    </div>
+
+</div>
+        <!-- WEAK TOPICS CARDS -->
+        <div class="bg-white p-5 rounded-xl shadow mb-8">
+            <h3 class="font-semibold mb-4">Weak Topics (%)😕</h3>
+
+            <div class="grid grid-cols-3 gap-4">
+                {% for t, v in topics.items() %}
+                <div class="bg-green-100 p-3 rounded text-center">
+                    <p class="font-medium">{{ t }}</p>
+                    <p class="text-sm">{{ v }}%</p>
+                </div>
+                {% endfor %}
+            </div>
+            <div class="border-t pt-4">
+
+    <h3 class="font-semibold mt-8 mb-3">Suggestions 💡</h3>
+
+    <ul class="space-y-2 text-sm text-gray-700">
+        {% for t, v in top_3 %}
+        <li>📌 Focus more on <b>{{ t }}</b> ({{ v }}%)</li>
+        {% endfor %}
+    </ul>
+</div>
+        </div>
+
+        <!-- STUDENTS TABLE -->
+        <div class="bg-white p-5 rounded-xl shadow">
+
+            <h3 class="font-semibold mb-4">Students👩🏻‍🎓</h3>
+
+            <!-- SEARCH + FILTER -->
+            <div class="flex gap-4 mb-4">
+                <input id="search" type="text"
+                    placeholder="Search by Name or USN"
+                    class="border p-2 rounded w-1/3">
+
+                <select id="filter" class="border p-2 rounded">
+                    <option value="all">All</option>
+                    <option value="Pass">Pass</option>
+                    <option value="Fail">Fail</option>
+                </select>
+            </div>
+
+            <!-- TABLE -->
+            <table class="w-full border-collapse">
+                <thead>
+                    <tr class="bg-gray-100">
+                        <th class="p-2">USN</th>
+                        <th>Name</th>
+                        <th>Marks</th>
+                        <th>Status</th>
+                        <th>Performance</th>
+                        <th>Doubt</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    {% for s in students %}
+                    <tr class="text-center border-b">
+                        <td>{{ s.USN }}</td>
+                        <td>{{ s.Name }}</td>
+                        <td>{{ "%.2f"|format(s.Marks) }}</td>
+                        <td class="{% if s.Result == 'Pass' %}text-green-600{% else %}text-red-500{% endif %}">
+                            {{ s.Result }}
+                        </td>
+                        <td>
+    {% if s.performance == "High" %}
+        <span class="px-3 py-1 text-sm font-semibold rounded-full bg-green-100 text-green-700">
+            High
+        </span>
+
+    {% elif s.performance == "Medium" %}
+        <span class="px-3 py-1 text-sm font-semibold rounded-full bg-yellow-100 text-yellow-700">
+            Medium
+        </span>
+
+    {% elif s.performance == "Low" %}
+        <span class="px-3 py-1 text-sm font-semibold rounded-full bg-red-100 text-red-700">
+            Low
+        </span>
+
+    {% else %}
+        <span class="px-3 py-1 text-sm font-semibold rounded-full bg-gray-100 text-gray-600">
+            Unknown
+        </span>
+    {% endif %}
+</td>
+<td>{{ s.details[-1].doubt }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+
+        </div>
+
+    </div>
+</div>
+
+<!-- JS -->
+<script>
+const topics = JSON.parse('{{ topics | tojson | safe }}');
+const passed = Number('{{ passed }}');
+const failed = Number('{{ failed }}');
+
+/* BAR */
+new Chart(document.getElementById("barChart"), {
+    type: "bar",
+    data: {
+        labels: Object.keys(topics),
+        datasets: [{
+            label: "Weak %",
+            data: Object.values(topics),
+            backgroundColor: [
+    "#16a34a",  // dark green
+    "#22c55e",  // green
+    "#4ade80",  // light green
+    "#86efac",  // softer green
+    "#bbf7d0"   // pastel green
+],
+borderColor: [
+    "#16a34a",
+    "#22c55e",
+    "#4ade80",
+    "#86efac",
+    "#bbf7d0"
+],
+borderWidth: 1
+        }]
+    }
+});
+
+/* PIE */
+new Chart(document.getElementById("pieChart"), {
+    type: "doughnut",
+    data: {
+        labels: ["Pass", "Fail"],
+        datasets: [{
+            data: [passed, failed],
+            backgroundColor: ["#166534", "#bbf7d0"],
+            borderWidth: 0
+        }]
+    },
+    options: {
+        cutout: "70%",
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+            legend: {
+                position: "bottom"
+            }
+        }
+    }
+});
+
+    
+/* SEARCH + FILTER */
+const searchInput = document.getElementById("search");
+const filterSelect = document.getElementById("filter");
+const rows = document.querySelectorAll("tbody tr");
+
+function filterTable() {
+    const search = searchInput.value.toLowerCase();
+    const filter = filterSelect.value;
+
+    rows.forEach(row => {
+        const name = row.children[1].innerText.toLowerCase();
+        const usn = row.children[0].innerText.toLowerCase();
+        const status = row.children[3].innerText;
+
+        const matchSearch = name.includes(search) || usn.includes(search);
+        const matchFilter = (filter === "all" || status === filter);
+
+        row.style.display = (matchSearch && matchFilter) ? "" : "none";
+    });
+}
+
+searchInput.addEventListener("keyup", filterTable);
+filterSelect.addEventListener("change", filterTable);
+</script>
+
+</body>
+</html>
